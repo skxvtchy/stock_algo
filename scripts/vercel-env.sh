@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Copy every non-empty variable from .env.local to the linked Vercel project's Production
 # environment. Values are piped through stdin, never put on the command line.
-# Usage (after `npx vercel link`):  npm run vercel:env
+# Usage (after `npx vercel link`):  npm run vercel:env            (send)
+#                                    npm run vercel:env -- --dry-run  (list names only)
 set -euo pipefail
 
+DRY_RUN=0
+if [ "${1:-}" = "--dry-run" ]; then DRY_RUN=1; shift; fi
 ENV_FILE="${1:-.env.local}"
 [ -f "$ENV_FILE" ] || { echo "No $ENV_FILE found"; exit 1; }
 [ -d .vercel ] || { echo "Run 'npx vercel link' first"; exit 1; }
@@ -23,9 +26,11 @@ while IFS= read -r line || [ -n "$line" ]; do
     NEXT_PUBLIC_*|ALLOWED_EMAILS|ALPACA_LIVE_TRADING_ENABLED) kind="--no-sensitive" ;;
     *) kind="--sensitive" ;;
   esac
+  if [ "$DRY_RUN" = 1 ]; then echo "would set  $name ($kind)"; count=$((count + 1)); continue; fi
   printf '%s' "$value" | npx -y vercel@latest env add "$name" --environment production --force "$kind" --yes >/dev/null
   echo "set   $name"
   count=$((count + 1))
 done < "$ENV_FILE"
 
+if [ "$DRY_RUN" = 1 ]; then echo "Dry run: $count variable(s) would be sent. Nothing was uploaded."; exit 0; fi
 echo "Done: $count variable(s) set in Production. Redeploy so they take effect: npx vercel deploy --prod"

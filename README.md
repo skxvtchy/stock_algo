@@ -70,7 +70,7 @@ Once per trading day, inside the window you pick (5–60 minutes before the clos
    - `SUPABASE_SECRET_KEY`: Supabase → Project Settings → API Keys → Secret keys. Server-only.
    - `CRON_SECRET`: a random string. Your local `.env.local` already has a generated one; use the same value everywhere.
 3. Deploy the app (for example to Vercel) so Supabase can reach it.
-4. In the Supabase SQL editor, open [`supabase/schedule_auto_run.sql`](supabase/schedule_auto_run.sql), replace the app URL and `CRON_SECRET` placeholders, and run it once.
+4. In the Supabase SQL editor, open [`supabase/schedule_auto_run.sql`](supabase/schedule_auto_run.sql), replace the `CRON_SECRET` placeholder (the app URL is already set to the production domain), and run it once.
 5. In the app, open **Trade** (Paper), pick a symbol, budget and algorithms, and turn on **Daily auto-run**. Its card shows the last result, and runs appear in **Recent runs** with an "Auto" badge.
 
 **Test it any time** without placing orders (shows what each schedule would trade right now):

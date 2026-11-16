@@ -1,5 +1,6 @@
 -- Schedule the daily paper auto-run with Supabase Cron (pg_cron + pg_net).
--- Run ONCE in the Supabase SQL editor after the app is deployed, replacing both placeholders.
+-- Run ONCE in the Supabase SQL editor after the app is deployed. Replace the CRON_SECRET placeholder
+-- with the value from your .env.local (the same value must be set in Vercel).
 --
 -- It pings the app every 5 minutes on weekday afternoons (UTC hours cover the 4pm ET close in
 -- both EST and EDT, and 1pm half-days). The app checks Alpaca's market clock and trades at most
@@ -16,7 +17,7 @@ select cron.schedule(
   '*/5 13-21 * * 1-5',
   $$
   select net.http_post(
-    url := 'https://REPLACE-WITH-YOUR-APP-DOMAIN/api/cron/auto-run',
+    url := 'https://stockalgo-seven.vercel.app/api/cron/auto-run', -- your Vercel production URL
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'stock_algo_cron_secret')

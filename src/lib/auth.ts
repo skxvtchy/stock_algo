@@ -34,7 +34,7 @@ export async function guard(level: Level): Promise<{ ok: true; auth: AuthState; 
 
   switch (auth.kind) {
     case "unconfigured":
-      return deny(503, "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to .env.local.");
+      return deny(503, "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (.env.local locally, Vercel env vars when deployed), then rebuild.");
     case "anonymous":
       return deny(401, "Not signed in");
     case "dev-bypass":
