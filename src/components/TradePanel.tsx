@@ -114,8 +114,9 @@ export default function TradePanel({ mode, onExecuted }: { mode: Mode; onExecute
         </p>
       </Card>
 
-      <Card title="Algorithms" sub={`${selected.size} of ${strategies.length} selected`}>
+      <Card title="Algorithms" sub={strategies.length ? `${selected.size} of ${strategies.length} selected` : "Loading…"}>
         <div className="flex flex-col gap-4">
+          {!strategies.length && <div className="h-24 animate-pulse rounded-xl bg-background" />}
           {GROUPS.map((g) => {
             const items = strategies.filter((s) => s.kind === g);
             if (!items.length) return null;

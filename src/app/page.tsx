@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import AppShell, { TABS, type Tab } from "@/components/AppShell";
+import AppShell from "@/components/AppShell";
 import SetupScreen from "@/components/SetupScreen";
 import { allowedEmails, getAuth } from "@/lib/auth";
+import { isTab } from "@/lib/tabs";
 
 // With Cache Components, the static shell (fallback) is prerendered and the
 // cookie/auth-dependent app streams in per request.
@@ -23,7 +24,7 @@ async function App() {
 
   const mode = jar.get("tradingMode")?.value === "live" ? "live" : "paper";
   const savedTab = jar.get("tab")?.value;
-  const tab: Tab = TABS.some((t) => t.id === savedTab) ? (savedTab as Tab) : "backtest";
+  const tab = isTab(savedTab) ? savedTab : "backtest";
 
   let notice: string | null = null;
   if (auth.kind === "user" && !auth.allowed) {

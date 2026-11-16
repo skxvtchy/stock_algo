@@ -4,18 +4,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Mode } from "@/lib/alpaca";
 import { getBrowserClient } from "@/lib/supabase/client";
+import type { Tab } from "@/lib/tabs";
 import AccountView from "./AccountView";
 import BacktestLab from "./BacktestLab";
 import { BoltIcon, ChartIcon, UserIcon, WalletIcon } from "./icons";
 import TradePanel from "./TradePanel";
 import { Button, Sheet } from "./ui";
 
-export const TABS = [
+const TABS: { id: Tab; label: string; Icon: typeof ChartIcon }[] = [
   { id: "backtest", label: "Backtest", Icon: ChartIcon },
   { id: "trade", label: "Trade", Icon: BoltIcon },
   { id: "account", label: "Account", Icon: WalletIcon },
-] as const;
-export type Tab = (typeof TABS)[number]["id"];
+];
 
 const remember = (key: string, value: string) => {
   document.cookie = `${key}=${value}; path=/; max-age=31536000; samesite=lax`;

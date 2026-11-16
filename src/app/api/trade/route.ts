@@ -37,7 +37,13 @@ export async function POST(req: Request) {
   if (!g.ok) return g.res;
   const userId = g.auth.kind === "user" ? g.auth.userId : null;
 
-  if (!isConfigured(mode)) return Response.json({ error: `Alpaca ${mode} keys are not configured` }, { status: 400 });
+  if (!isConfigured(mode)) {
+    const P = mode.toUpperCase();
+    return Response.json(
+      { error: `Alpaca ${mode} keys aren't set. Add ALPACA_${P}_KEY_ID and ALPACA_${P}_SECRET_KEY to .env.local and restart.` },
+      { status: 400 },
+    );
+  }
 
   if (body.execute && mode === "live") {
     if (!liveTradingEnabled()) {
