@@ -261,7 +261,10 @@ export default function AccountView({ mode, refreshKey }: { mode: Mode; refreshK
               {runs.map((r) => (
                 <li key={r.id} className="px-1 py-2.5">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-ink">{r.symbol} · {r.orders_placed} order{r.orders_placed === 1 ? "" : "s"}</span>
+                    <span className="font-semibold text-ink">
+                      {r.symbol} · {r.orders_placed} order{r.orders_placed === 1 ? "" : "s"}
+                      {r.source === "auto" && <span className="ml-1.5 rounded bg-paper/10 px-1.5 py-0.5 text-[11px] font-semibold text-paper">Auto</span>}
+                    </span>
                     <span className="num text-xs text-ink-3">{new Date(r.created_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1">

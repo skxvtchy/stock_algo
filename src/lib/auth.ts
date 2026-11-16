@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { allowedEmails } from "./allowlist";
 import { devAuthBypass, supabaseConfigured } from "./supabase/config";
 import { createClient } from "./supabase/server";
 
@@ -8,10 +9,7 @@ export type AuthState =
   | { kind: "anonymous" }
   | { kind: "unconfigured" };
 
-/** Emails allowed to use the Alpaca features (comma-separated ALLOWED_EMAILS). */
-export function allowedEmails() {
-  return (process.env.ALLOWED_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-}
+export { allowedEmails };
 
 export async function getAuth(): Promise<AuthState> {
   if (!supabaseConfigured) return devAuthBypass ? { kind: "dev-bypass" } : { kind: "unconfigured" };

@@ -13,11 +13,15 @@ const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 const cache = new Map<string, { at: number; bars: Bar[] }>();
 const TTL_MS = 60 * 60 * 1000;
 
-/** Daily OHLCV from Yahoo Finance, with OHLC scaled to the adjusted close. */
-export async function fetchBars(ticker: string, start: string): Promise<Bar[]> {
+/**
+ * Daily OHLCV from Yahoo Finance, with OHLC scaled to the adjusted close.
+ * During market hours the last bar is today's, priced at the latest trade.
+ * Pass `fresh` when trading so prices are never served from the 1-hour cache.
+ */
+export async function fetchBars(ticker: string, start: string, opts: { fresh?: boolean } = {}): Promise<Bar[]> {
   const key = `${ticker}|${start}`;
   const hit = cache.get(key);
-  if (hit && Date.now() - hit.at < TTL_MS) return hit.bars;
+  if (!opts.fresh && hit && Date.now() - hit.at < TTL_MS) return hit.bars;
 
   const res = await yf.chart(ticker, { period1: start, interval: "1d" });
   const bars: Bar[] = [];

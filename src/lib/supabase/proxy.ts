@@ -2,7 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { supabaseConfigured, supabaseKey, supabaseUrl } from "./config";
 
-const PUBLIC_PATHS = ["/login", "/auth/"];
+// /api/cron/* is called by Supabase Cron with its own bearer secret instead of a user session.
+const PUBLIC_PATHS = ["/login", "/auth/", "/api/cron/"];
 
 /** Refresh the Supabase session on every request and gate the app behind login. */
 export async function updateSession(request: NextRequest) {

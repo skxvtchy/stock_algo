@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { guard } from "@/lib/auth";
 import {
-  algoBook, algoOf, getAccount, getHistory, getOrders, getPositions, isConfigured, liveTradingEnabled, type Mode,
+  algoBook, algoOf, getAccount, getAllOrders, getHistory, getPositions, isConfigured, liveTradingEnabled, type Mode,
 } from "@/lib/alpaca";
 
 export async function GET(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const [account, positions, orders, history] = await Promise.all([
-      getAccount(mode), getPositions(mode), getOrders(mode), getHistory(mode),
+      getAccount(mode), getPositions(mode), getAllOrders(mode), getHistory(mode),
     ]);
     const price = new Map(positions.map((p) => [p.symbol, Number(p.current_price)]));
     const book = algoBook(orders).map((h) => {

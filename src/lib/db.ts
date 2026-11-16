@@ -12,6 +12,7 @@ export interface TradeSettings {
 
 export interface TradeRunRow {
   id: string;
+  source: "manual" | "auto";
   mode: Mode;
   symbol: string;
   price: number;
@@ -87,4 +88,40 @@ export async function listBacktests(db: SupabaseClient | null, limit = 10): Prom
     .limit(limit);
   warn("listBacktests", error);
   return (data as BacktestRow[]) ?? [];
+}
+
+// ---------------------------------------------------------------- daily auto-run (paper only)
+
+export type AutoStatus = "running" | "ok" | "partial" | "error" | "skipped";
+
+export interface AutoConfig {
+  user_id: string;
+  enabled: boolean;
+  symbol: string;
+  budget_per_algo: number;
+  algo_ids: string[];
+  minutes_before_close: number;
+  last_run_on: string | null; // trading day (New York date) of the last claimed run
+  last_run_at: string | null;
+  last_status: AutoStatus | null;
+  last_message: string | null;
+}
+
+export type AutoConfigInput = Pick<AutoConfig, "enabled" | "symbol" | "budget_per_algo" | "algo_ids" | "minutes_before_close">;
+
+export async function getAutoConfig(db: SupabaseClient | null): Promise<AutoConfig | null> {
+  if (!db) return null;
+  const { data, error } = await db.from("auto_trade_configs").select("*").maybeSingle();
+  warn("getAutoConfig", error);
+  return data ? { ...data, budget_per_algo: Number(data.budget_per_algo) } : null;
+}
+
+export async function saveAutoConfig(db: SupabaseClient, userId: string, cfg: AutoConfigInput): Promise<AutoConfig> {
+  const { data, error } = await db
+    .from("auto_trade_configs")
+    .upsert({ user_id: userId, ...cfg, updated_at: new Date().toISOString() }, { onConflict: "user_id" })
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return { ...data, budget_per_algo: Number(data.budget_per_algo) };
 }

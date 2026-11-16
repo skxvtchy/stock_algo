@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Mode } from "@/lib/alpaca";
 import type { TradeRunRow, TradeSettings } from "@/lib/db";
 import { usd } from "@/lib/format";
+import AutoRunCard from "./AutoRunCard";
 import { Button, Card, Chip, ErrorNote, Field, inputCls, KIND_LABEL, Sheet, SignalBadge } from "./ui";
 
 interface StrategyInfo { id: string; name: string; kind: string; description: string }
@@ -142,6 +143,8 @@ export default function TradePanel({ mode, onExecuted }: { mode: Mode; onExecute
         </div>
       </Card>
 
+      <AutoRunCard mode={mode} symbol={symbol} budget={budget} algoIds={[...selected]} />
+
       {error && <ErrorNote>{error}</ErrorNote>}
 
       {current && (
@@ -186,7 +189,10 @@ export default function TradePanel({ mode, onExecuted }: { mode: Mode; onExecute
             {runs.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-3 px-1 py-2.5 text-sm">
                 <div>
-                  <div className="font-medium text-ink">{r.symbol} · {r.orders_placed} order{r.orders_placed === 1 ? "" : "s"}</div>
+                  <div className="font-medium text-ink">
+                    {r.symbol} · {r.orders_placed} order{r.orders_placed === 1 ? "" : "s"}
+                    {r.source === "auto" && <span className="ml-1.5 rounded bg-paper/10 px-1.5 py-0.5 text-[11px] font-semibold text-paper">Auto</span>}
+                  </div>
                   <div className="text-xs text-ink-3">{new Date(r.created_at).toLocaleString()} · {usd(r.budget_per_algo, 0)}/algo</div>
                 </div>
                 <div className="num text-right text-xs text-ink-2">

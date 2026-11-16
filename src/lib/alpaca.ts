@@ -84,10 +84,43 @@ export interface PortfolioHistory {
   profit_loss: (number | null)[];
 }
 
+export interface AlpacaClock {
+  timestamp: string;
+  is_open: boolean;
+  next_open: string;
+  next_close: string; // accounts for early-close days
+}
+
+export const getClock = (m: Mode) => call<AlpacaClock>(m, "/v2/clock");
 export const getAccount = (m: Mode) => call<AlpacaAccount>(m, "/v2/account");
 export const getPositions = (m: Mode) => call<AlpacaPosition[]>(m, "/v2/positions");
 export const getOrders = (m: Mode, limit = 500) =>
   call<AlpacaOrder[]>(m, `/v2/orders?status=all&limit=${limit}&direction=desc&nested=false`);
+/**
+ * Every order, newest first, paging back through history (500 per page). Per-algorithm
+ * holdings are rebuilt from tagged orders, so they need the full history, not just the last page.
+ */
+export async function getAllOrders(m: Mode, maxPages = 40): Promise<AlpacaOrder[]> {
+  const out: AlpacaOrder[] = [];
+  const seen = new Set<string>();
+  let until: string | undefined;
+  for (let page = 0; page < maxPages; page++) {
+    const q = new URLSearchParams({ status: "all", limit: "500", direction: "desc", nested: "false" });
+    if (until) q.set("until", until);
+    const batch = await call<AlpacaOrder[]>(m, `/v2/orders?${q}`);
+    let added = 0;
+    for (const o of batch) {
+      if (seen.has(o.id)) continue;
+      seen.add(o.id);
+      out.push(o);
+      added++;
+    }
+    if (batch.length < 500 || added === 0) break;
+    until = batch[batch.length - 1].submitted_at;
+  }
+  return out;
+}
+
 export const getHistory = (m: Mode, period = "3M") =>
   call<PortfolioHistory>(m, `/v2/account/portfolio/history?period=${period}&timeframe=1D`);
 
