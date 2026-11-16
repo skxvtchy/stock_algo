@@ -37,9 +37,17 @@ Without Supabase keys, `npm run dev` still runs with auth turned off so you can 
 ### Using it on your phone
 
 - On the same Wi-Fi: run `npm run dev -- -H 0.0.0.0` and open `http://<your-computer's-LAN-IP>:3000`.
-- Anywhere: deploy (for example to Vercel), set the same env vars there, and add the deployed URL to Supabase → Authentication → URL Configuration.
+- Anywhere: deploy it (see [Deploy to Vercel](#deploy-to-vercel)).
 
 Either way, use your browser's **Add to Home Screen** to install it as an app.
+
+## Deploy to Vercel
+
+1. **Sign in and link:** `npx vercel login`, then `npx vercel link`. This creates the Vercel project and connects this GitHub repo, so every push to `main` redeploys.
+2. **Env vars:** `npm run vercel:env` copies every non-empty value from `.env.local` to the Production environment. Values go through stdin, and secrets are stored as sensitive. You can also add them in Vercel → Project → Settings → Environment Variables.
+3. **Deploy:** `npx vercel deploy --prod`. `NEXT_PUBLIC_*` values are baked in at build time, so redeploy after changing them. Until they're set, the site shows a checklist of missing variables.
+4. **Supabase auth URLs:** in Supabase → Authentication → URL Configuration, set **Site URL** to your Vercel URL and add `https://<your-app>/auth/callback` to **Redirect URLs** so email confirmation links work.
+5. **Daily auto-run:** put the URL into [`supabase/schedule_auto_run.sql`](supabase/schedule_auto_run.sql) and run it once.
 
 ## Safety rails
 
