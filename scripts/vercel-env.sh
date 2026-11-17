@@ -21,6 +21,9 @@ while IFS= read -r line || [ -n "$line" ]; do
   case "$name" in VERCEL_*) continue ;; esac
   value="${value%\"}"; value="${value#\"}"
   if [ -z "$value" ]; then echo "skip  $name (empty)"; continue; fi
+  if [[ "$name" == NEXT_PUBLIC_* && "$value" == sb_secret_* ]]; then
+    echo "STOP  $name holds a Supabase SECRET key. Move it to SUPABASE_SECRET_KEY first."; exit 1
+  fi
   # Public/config values stay readable in the dashboard; everything else is stored as a secret.
   case "$name" in
     NEXT_PUBLIC_*|ALLOWED_EMAILS|ALPACA_LIVE_TRADING_ENABLED) kind="--no-sensitive" ;;

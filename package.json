@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "auto-run": "tsx scripts/auto-run.ts",
-    "vercel:env": "bash scripts/vercel-env.sh"
+    "vercel:env": "bash scripts/vercel-env.sh",
+    "check-env": "tsx scripts/check-env.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
